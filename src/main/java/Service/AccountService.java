@@ -1,6 +1,8 @@
 package Service;
+
 import Model.Account;
 import DAO.AccountDAO;
+
 
 public class AccountService {
     private AccountDAO accountDAO;
@@ -10,12 +12,9 @@ public class AccountService {
     public AccountService(AccountDAO accountDAO){
         this.accountDAO = accountDAO;
     }
+
     public Account getAccount(String username, String password){
-        Account account = accountDAO.getAccount(username, password);
-        return account;
-    }
-    public Account addAccount(Account account){
-        Account addedAccount = accountDAO.insertAccount(account);
-        return addedAccount;
+            Account account = accountDAO.getAccount(username, password);
+            return account;
     }
 }

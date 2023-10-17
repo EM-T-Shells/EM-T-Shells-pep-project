@@ -31,7 +31,9 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.post("/login", this::postAccountHandler);
+
         return app;
+
     }
 
     private void postAccountHandler(Context ctx) {
@@ -39,8 +41,10 @@ public class SocialMediaController {
         Account verifiedAccount = accountService.getAccount(account.getUsername(), account.getPassword());
         if(verifiedAccount != null){
             ctx.json(verifiedAccount);
+            ctx.status(200);
         } else{
             ctx.status(401);
         }
     }
+
 }
