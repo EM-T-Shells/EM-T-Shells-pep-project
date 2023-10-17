@@ -8,7 +8,7 @@ public class AccountDAO {
     public Account getAccount(String username, String password){
         Connection connection = ConnectionUtil.getConnection();
         try{
-            String sql = "SELECT * FROM account WHERE username=?, password=?";
+            String sql = "SELECT * FROM account WHERE username=? AND password=?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, username);

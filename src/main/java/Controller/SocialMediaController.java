@@ -3,6 +3,8 @@ package Controller;
 import Model.Account;
 import Service.AccountService;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
@@ -20,21 +22,25 @@ public class SocialMediaController {
      * @return a Javalin app object which defines the behavior of the Javalin controller.
      */
     
-    
-     public Javalin startAPI() {
-        Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
+    AccountService accountService;
 
+    public SocialMediaController(){
+        this.accountService = new AccountService();
+    }
+
+    public Javalin startAPI() {
+        Javalin app = Javalin.create();
+        app.post("/login", this::postAccountHandler);
         return app;
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
+    private void postAccountHandler(Context ctx) {
+        Account account = ctx.bodyAsClass(Account.class);
+        Account verifiedAccount = accountService.getAccount(account.getUsername(), account.getPassword());
+        if(verifiedAccount != null){
+            ctx.json(verifiedAccount);
+        } else{
+            ctx.status(401);
+        }
     }
-
-
 }
