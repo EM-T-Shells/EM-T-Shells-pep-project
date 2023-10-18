@@ -17,4 +17,9 @@ public class AccountService {
             Account account = accountDAO.getAccount(username, password);
             return account;
     }
+
+    public Account addAccount(Account account){
+        Account addedAccount = accountDAO.insertAccount(account);
+        return addedAccount;
+    }
 }
