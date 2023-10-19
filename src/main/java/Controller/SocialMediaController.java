@@ -1,7 +1,9 @@
 package Controller;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 
 import static org.mockito.ArgumentMatchers.nullable;
 
@@ -23,15 +25,20 @@ public class SocialMediaController {
      */
     
     AccountService accountService;
+    MessageService messageService;
 
     public SocialMediaController(){
         this.accountService = new AccountService();
+        this.messageService = new MessageService();
     }
 
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         app.post("/login", this::postAccountHandler);
         app.post("/register", this::postRegisterHandler);
+
+        app.post("/messages", this::postMessageHandler);
+
         return app;
 
     }
@@ -55,6 +62,17 @@ public class SocialMediaController {
             ctx.status(400);
         }else{
             ctx.json(mapper.writeValueAsString(addedAccount));
+        }
+    }
+
+    private void postMessageHandler(Context ctx) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message addedMessage = messageService.addMessage(message);
+        if(addedMessage==null){
+            ctx.status(400);
+        }else{
+            ctx.json(mapper.writeValueAsString(addedMessage));
         }
     }
 }
