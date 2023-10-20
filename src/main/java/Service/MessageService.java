@@ -17,8 +17,8 @@ public class MessageService {
         return addedMessage;
     }
 
-    public Message getAllMessages(int posted_by, String message_text){
-        Message getAllMessages = messageDAO.retrieveAllMessages(posted_by, message_text);
+    public Message getAllMessages(){
+        Message getAllMessages = messageDAO.retrieveAllMessages();
         return getAllMessages;
     }
 

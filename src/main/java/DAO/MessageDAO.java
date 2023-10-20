@@ -6,6 +6,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List; 
+
 
 public class MessageDAO {
     
@@ -66,31 +69,32 @@ public class MessageDAO {
         }
     }
 
-    public Message retrieveAllMessages(int posted_by, String message_text){
+    public List<Message> getAllMessages(){
         Connection connection = ConnectionUtil.getConnection();
+        List<Message> messages = new ArrayList<>();
         try{
-            String sql = "SELECT * FROM message WHERE posted_by=?, message_text=?";
+            String sql = "SELECT * FROM message";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-            preparedStatement.setInt(1, posted_by);
-            preparedStatement.setString(2, message_text);
 
             ResultSet rs = preparedStatement.executeQuery();
 
-            if(rs.next()){
+            while(rs.next()){             
                 int message_id = rs.getInt("message_id");
                 int retrievePosted_by = rs.getInt("posted_by");
                 String retrieveMessage_text = rs.getString("message_text");
                 long  time_posted_epoch = rs.getLong("time_posted_epoch");             
             
+                Message message = new Message(
+                    message_id, 
+                    retrievePosted_by, 
+                    retrieveMessage_text, 
+                    time_posted_epoch);
 
-                Message message = new Message(message_id, retrievePosted_by, retrieveMessage_text, time_posted_epoch);
-                return message;
+                messages.add(message);
             }
-
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
-        return null;
+        return messages;
     }
 }
