@@ -7,8 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List; 
-
+import java.util.List;
 
 public class MessageDAO {
     
@@ -40,7 +39,6 @@ public class MessageDAO {
         return null;
     }
 
-    //message_text is not blank, is under 255 characters, and posted_by refers to a real, existing user.
     private boolean isValidMessage(Message message) {
         String message_text = message.getMessage_text();
         int posted_by = message.getPosted_by();
@@ -97,4 +95,36 @@ public class MessageDAO {
         }
         return messages;
     }
+
+    public List<Message> getUserMessages(int userId){
+        Connection connection = ConnectionUtil.getConnection();
+        List<Message> userMessages = new ArrayList<>();
+        try{
+            String sql="SELECT * FROM Message WHERE posted_by=?";
+            PreparedStatement preparedStatement=connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            while(rs.next()){
+                int message_id = rs.getInt("message_id");
+                String message_text = rs.getString("message_text");
+                long  time_posted_epoch = rs.getLong("time_posted_epoch");             
+            
+                Message userMessage = new Message(
+                    message_id,
+                    userId, 
+                    message_text, 
+                    time_posted_epoch);
+                    
+                userMessages.add(userMessage);
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return userMessages;
+    }
+
+
+
+
 }
