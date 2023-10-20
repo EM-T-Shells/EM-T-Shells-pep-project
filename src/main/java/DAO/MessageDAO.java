@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.h2.command.Prepared;
+
 public class MessageDAO {
     
     public Message insertMessage(Message message){
@@ -115,7 +117,7 @@ public class MessageDAO {
                     userId, 
                     message_text, 
                     time_posted_epoch);
-                    
+
                 userMessages.add(userMessage);
             }
         }catch(SQLException e){
@@ -124,7 +126,22 @@ public class MessageDAO {
         return userMessages;
     }
 
+    public boolean deleteMessage(int message_id){
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql="DELETE FROM Message WHERE message_id=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
+            preparedStatement.setInt(1, message_id);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
 
 }

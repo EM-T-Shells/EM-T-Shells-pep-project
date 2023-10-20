@@ -19,6 +19,11 @@ public class MessageService {
         return addedMessage;
     }
 
+    public boolean deleteMessage(int message_id){
+        boolean deletedMessage = messageDAO.deleteMessage(message_id);
+        return deletedMessage;
+    }
+
     public List<Message> getAllMessages(){
         List<Message> getAllMessages = messageDAO.getAllMessages();
         return getAllMessages;
