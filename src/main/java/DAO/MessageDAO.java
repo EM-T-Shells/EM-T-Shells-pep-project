@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.h2.command.Prepared;
 
 public class MessageDAO {
     
@@ -126,22 +125,54 @@ public class MessageDAO {
         return userMessages;
     }
 
-    public boolean deleteMessage(int message_id){
+    public Message deleteMessage(int message_id) {
         Connection connection = ConnectionUtil.getConnection();
+        Message deletedMessage = null;
+        
         try {
-            String sql="DELETE FROM Message WHERE message_id=?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-            preparedStatement.setInt(1, message_id);
-
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            return rowsAffected > 0;
+            if (messageExist(message_id)) {
+                String selectSql = "SELECT * FROM Message WHERE message_id=?";
+                PreparedStatement selectStatement = connection.prepareStatement(selectSql);
+                selectStatement.setInt(1, message_id);
+                
+                ResultSet resultSet = selectStatement.executeQuery();
+                
+                if (resultSet.next()) {
+                    deletedMessage = new Message(
+                        resultSet.getInt("message_id"),
+                        resultSet.getInt("posted_by"),
+                        resultSet.getString("message_text"),
+                        resultSet.getLong("time_posted_epoch")
+                    );
+                }
+                
+                String deleteSql = "DELETE FROM Message WHERE message_id=?";
+                PreparedStatement deleteStatement = connection.prepareStatement(deleteSql);
+                deleteStatement.setInt(1, message_id);
+                deleteStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return false;
         }
+        return deletedMessage;
+    } 
+    
+    private boolean messageExist(int message_id) {
+        String checkExistSql = "SELECT COUNT(*) FROM Message WHERE message_id=?";
+        try {
+            Connection connection = ConnectionUtil.getConnection();
+            PreparedStatement checkExistStatement = connection.prepareStatement(checkExistSql);
+            checkExistStatement.setInt(1, message_id);
+            ResultSet resultSet = checkExistStatement.executeQuery();
+            
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        return false;
     }
-
-
 }

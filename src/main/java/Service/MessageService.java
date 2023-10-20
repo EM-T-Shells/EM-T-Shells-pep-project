@@ -19,11 +19,6 @@ public class MessageService {
         return addedMessage;
     }
 
-    public boolean deleteMessage(int message_id){
-        boolean deletedMessage = messageDAO.deleteMessage(message_id);
-        return deletedMessage;
-    }
-
     public List<Message> getAllMessages(){
         List<Message> getAllMessages = messageDAO.getAllMessages();
         return getAllMessages;
@@ -32,6 +27,11 @@ public class MessageService {
     public List<Message> getUserMessages(int userId){
         List<Message> getUserMessages = messageDAO.getUserMessages(userId);
         return getUserMessages;
+    }
+
+    public Message deleteMessage(int message_id){
+        Message deletedMessage = messageDAO.deleteMessage(message_id);
+        return deletedMessage;
     }
 
 }
