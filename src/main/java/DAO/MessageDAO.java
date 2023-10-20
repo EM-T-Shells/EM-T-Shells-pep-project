@@ -38,12 +38,11 @@ public class MessageDAO {
     }
 
     //message_text is not blank, is under 255 characters, and posted_by refers to a real, existing user.
-
     private boolean isValidMessage(Message message) {
         String message_text = message.getMessage_text();
         int posted_by = message.getPosted_by();
        
-        if (message_text != null && !message_text.trim().isEmpty() && message_text.length() <= 255 && isUserReal(posted_by)){
+        if (message_text != null && !message_text.trim().isEmpty() && message_text.length() < 255 && isUserReal(posted_by)){
             return true;
         }
         return false;
@@ -65,5 +64,33 @@ public class MessageDAO {
             System.out.println(e.getMessage());
             return false; 
         }
+    }
+
+    public Message retrieveAllMessages(int posted_by, String message_text){
+        Connection connection = ConnectionUtil.getConnection();
+        try{
+            String sql = "SELECT * FROM message WHERE posted_by=?, message_text=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            preparedStatement.setInt(1, posted_by);
+            preparedStatement.setString(2, message_text);
+
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if(rs.next()){
+                int message_id = rs.getInt("message_id");
+                int retrievePosted_by = rs.getInt("posted_by");
+                String retrieveMessage_text = rs.getString("message_text");
+                long  time_posted_epoch = rs.getLong("time_posted_epoch");             
+            
+
+                Message message = new Message(message_id, retrievePosted_by, retrieveMessage_text, time_posted_epoch);
+                return message;
+            }
+
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return null;
     }
 }

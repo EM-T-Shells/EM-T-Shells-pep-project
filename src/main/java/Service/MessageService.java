@@ -16,4 +16,10 @@ public class MessageService {
         Message addedMessage = messageDAO.insertMessage(message);
         return addedMessage;
     }
+
+    public Message getAllMessages(int posted_by, String message_text){
+        Message getAllMessages = messageDAO.retrieveAllMessages(posted_by, message_text);
+        return getAllMessages;
+    }
+
 }
