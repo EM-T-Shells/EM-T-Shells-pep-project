@@ -208,7 +208,7 @@ public class MessageDAO {
             String message_text = message.getMessage_text();
             int posted_by = message.getPosted_by();
            
-            if (message_text != null && !message_text.trim().isEmpty() && message_text.length() <= 255 && isUserReal(posted_by)){
+            if (message_text != null && !message_text.trim().isEmpty() && message_text.length() < 255 && isUserReal(posted_by)){
                 return true;
             }
         }

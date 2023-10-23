@@ -38,11 +38,16 @@ public class MessageService {
 
     public Message updateMessage(int message_id, Message message){
         Message existingMessage = messageDAO.getMessageByID(message_id);
-        if (existingMessage != null && messageDAO.isValidMessage(message)) {       
-                existingMessage.setMessage_text(message.getMessage_text());
-                messageDAO.updateMessage(message_id, existingMessage); 
+        if (existingMessage != null) {
+            String newMessageText = message.getMessage_text();
+    
+            if (!newMessageText.trim().isEmpty() && newMessageText.length() < 255) {
+                existingMessage.setMessage_text(newMessageText);
+                messageDAO.updateMessage(message_id, existingMessage);
                 return existingMessage;
-        } else return null;
+            }
+        }
+        return null;
     }
 
     public Message deleteMessage(int message_id){
