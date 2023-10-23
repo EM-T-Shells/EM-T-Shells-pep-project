@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.h2.command.Prepared;
+
 
 public class MessageDAO {
     
@@ -38,34 +40,6 @@ public class MessageDAO {
             }
         } 
         return null;
-    }
-
-    private boolean isValidMessage(Message message) {
-        String message_text = message.getMessage_text();
-        int posted_by = message.getPosted_by();
-       
-        if (message_text != null && !message_text.trim().isEmpty() && message_text.length() < 255 && isUserReal(posted_by)){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isUserReal(int posted_by) {
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "SELECT COUNT(*) FROM message WHERE posted_by = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, posted_by);
-    
-            ResultSet rs = preparedStatement.executeQuery();
-            rs.next();
-            int count = rs.getInt(1);
-    
-            return count > 0; 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false; 
-        }
     }
 
     public List<Message> getAllMessages(){
@@ -157,10 +131,31 @@ public class MessageDAO {
         return null;
     }
 
+    public Message updateMessage(int message_id, Message message){
+        Connection connection = ConnectionUtil.getConnection();
+        Message updatedMessage = null;
+        try{
+            if(messageExist(message_id)){
+                String sql = "UPDATE Message SET message_text=? WHERE message_id=?";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setString(1, message.getMessage_text());
+                preparedStatement.setInt(2, message_id);
+
+                int rowsUpdated = preparedStatement.executeUpdate();
+
+                if(rowsUpdated>0){
+                    updatedMessage = getMessageByID(message_id);
+                }
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return updatedMessage;
+    };
+
     public Message deleteMessage(int message_id) {
         Connection connection = ConnectionUtil.getConnection();
         Message deletedMessage = null;
-        
         try {
             if (messageExist(message_id)) {
                 String selectSql = "SELECT * FROM Message WHERE message_id=?";
@@ -189,7 +184,7 @@ public class MessageDAO {
         return deletedMessage;
     } 
     
-    private boolean messageExist(int message_id) {
+    public boolean messageExist(int message_id) {
         String checkExistSql = "SELECT COUNT(*) FROM Message WHERE message_id=?";
         try {
             Connection connection = ConnectionUtil.getConnection();
@@ -206,6 +201,36 @@ public class MessageDAO {
         }
         
         return false;
+    }
+
+    public boolean isValidMessage(Message message) {
+        if(message != null){
+            String message_text = message.getMessage_text();
+            int posted_by = message.getPosted_by();
+           
+            if (message_text != null && !message_text.trim().isEmpty() && message_text.length() <= 255 && isUserReal(posted_by)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isUserReal(int posted_by) {
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "SELECT COUNT(*) FROM message WHERE posted_by = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, posted_by);
+    
+            ResultSet rs = preparedStatement.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+    
+            return count > 0; 
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false; 
+        }
     }
 
 

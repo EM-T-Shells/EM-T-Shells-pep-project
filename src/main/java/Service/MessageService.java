@@ -36,6 +36,15 @@ public class MessageService {
         return getMessageByID;
     }
 
+    public Message updateMessage(int message_id, Message message){
+        Message existingMessage = messageDAO.getMessageByID(message_id);
+        if (existingMessage != null && messageDAO.isValidMessage(message)) {       
+                existingMessage.setMessage_text(message.getMessage_text());
+                messageDAO.updateMessage(message_id, existingMessage); 
+                return existingMessage;
+        } else return null;
+    }
+
     public Message deleteMessage(int message_id){
         Message deletedMessage = messageDAO.deleteMessage(message_id);
         return deletedMessage;
