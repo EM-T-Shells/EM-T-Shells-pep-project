@@ -3,6 +3,8 @@ package Service;
 import Model.Message;
 import DAO.MessageDAO;
 
+import static org.mockito.Mockito.mockitoSession;
+
 import java.util.List;
 
 public class MessageService {
@@ -27,6 +29,11 @@ public class MessageService {
     public List<Message> getUserMessages(int userId){
         List<Message> getUserMessages = messageDAO.getUserMessages(userId);
         return getUserMessages;
+    }
+
+    public Message getMessageByID(int message_id){
+        Message getMessageByID = messageDAO.getMessageByID(message_id);
+        return getMessageByID;
     }
 
     public Message deleteMessage(int message_id){

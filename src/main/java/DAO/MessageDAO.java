@@ -50,7 +50,7 @@ public class MessageDAO {
         return false;
     }
 
-    public boolean isUserReal(int posted_by) {
+    private boolean isUserReal(int posted_by) {
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "SELECT COUNT(*) FROM message WHERE posted_by = ?";
@@ -125,6 +125,38 @@ public class MessageDAO {
         return userMessages;
     }
 
+    public Message getMessageByID(int message_id){
+        Connection connection = ConnectionUtil.getConnection();
+        Message message = null;
+        try{
+            if(messageExist(message_id)){
+                String sql = "SELECT * FROM Message WHERE message_id = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setInt(1, message_id);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+    
+                if(resultSet.next()){
+                    int retrievedMessage_id = resultSet.getInt("message_id");
+                    int retrievePosted_by = resultSet.getInt("posted_by");
+                    String retrieveMessage_text = resultSet.getString("message_text");
+                    long  time_posted_epoch = resultSet.getLong("time_posted_epoch");             
+                
+                    message = new Message(
+                        retrievedMessage_id, 
+                        retrievePosted_by, 
+                        retrieveMessage_text, 
+                        time_posted_epoch);
+    
+                    return message;
+                }
+            }
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     public Message deleteMessage(int message_id) {
         Connection connection = ConnectionUtil.getConnection();
         Message deletedMessage = null;
@@ -175,4 +207,6 @@ public class MessageDAO {
         
         return false;
     }
+
+
 }
